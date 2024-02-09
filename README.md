@@ -1,11 +1,6 @@
 SpikingBERT
 ======== 
-SpikingBERT is a Spiking variant of BERT based encoder-only language model architecture. Both internal layer and prediction layer Knowledge Distillation (KD) is performed
-to improve model performance. Moreover, KD is performed on both general data (pre-training phase) as well as task-specific KD (i.e. for finetuning).
-SpikingBERT being a spiking architecture allows for dynamic tradeoff of energy/power consumption and accuracy of the model. Moreover, the KD techniques deployed
-allows to reduce number of model parameters.
-
-
+SpikingBERT is a Spiking variant of BERT-based encoder-only language model (LM). We use a unique training approach namely, Implicit Differentiation at Equilibrium, which helps us to (a) overcome the non-differentiability issues faced during training SNNs (b) train a deep scalable architecture with drastically reduced memory overrhead. We leverage the convergence of the average spiking rate (ASR) across individual neuronal layers, as outlined in the paper, to employ Implicit Differentiation at Equilibrium (i.e. at the final converged state) for training, instead of the computationally intensive Backpropagation Through Time (BPTT) method. Since training LMs from scratch is an expensive operation we leverage a novel ANN-SNN Knowledge Distillation framework, thereby making efficient use of techniques such as knowledge transfer and model compression. Both internal layer and prediction layer KD is performed to improve model performance as described in the paper. Moreover, KD is performed on both general data (pre-training phase) as well as task-specific data (i.e. for finetuning). SpikingBERT being a spiking architecture allows for dynamic tradeoff of energy/power consumption and accuracy of the model. Moreover, the KD techniques deployed allows to reduce number of model parameters.
 
 This code implements the methodology described in the paper titled: "SpikingBERT: Distilling BERT to Train Spiking Language Models Using Implicit
 Differentiation".
@@ -113,8 +108,7 @@ python spiking_bert_task_distill.py --pred_distill  \
                        --train_batch_size 32 
                        
 ```
-The hyper-parameters given in the paper can be used to recreate the results. Since the model size is  greater than 50 MB (size limit of submission) we could not upload a finetuned model for direct evaluation. However, we added logs for all 3 STEPS for different scenarios like general KD, task-based IKD and pred_layer distill. 
-It is to be noted that for pred_distill 2-4 epochs are enough for almost all tasks once task-based IKD is done properly.
+The hyper-parameters given in the paper can be used to recreate the results. We added logs for all 3 STEPS for different scenarios like general KD, task-based IKD and pred_layer distill.  It is to be noted that for pred_distill 2-4 epochs are enough for almost all tasks once task-based IKD is done properly.
 
 
 Evaluation
@@ -166,4 +160,14 @@ File Details
 |`task_name`|Name of the dataset.|`--task_name QQP`|
 |`data_dir`|Directory of the dataset.|`--data_dir ./glue_benchmark/SST-2/`|
 
+## Reference
 
+Please cite this code with the following bibliography:
+
+```
+@article{bal2023spikingbert,
+  title={Spikingbert: Distilling bert to train spiking language models using implicit differentiation},
+  author={Bal, Malyaban and Sengupta, Abhronil},
+  journal={arXiv preprint arXiv:2308.10873},
+  year={2023}
+}
