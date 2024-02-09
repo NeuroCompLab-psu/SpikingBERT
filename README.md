@@ -83,8 +83,7 @@ python spiking_bert_task_distill.py --teacher_model ${FT_BERT_BASE_DIR}$ \
 
 Step 3: Task-specific Prediction layer KD (IKD) from Finetuned BERT to SpikingBERT
 ==========================
-(a) use `spiking_bert_task_distill.py` with flag --pred_distill to run the prediction layer distillation. Either in place of or post prediction-layer distillation we can also finetune the model further by adding the flag --train_true_labels
-which will allow us to train the model not using the output logits of a finetuned BERT model but the actual true labels of the samples used. The spiking_student_model can be the directory where the output of the task-based IKD phase is stored.\
+(a) use `spiking_bert_task_distill.py` with flag --pred_distill to run the prediction layer distillation. Either in place of or post prediction-layer distillation we can also finetune the model further by adding the flag --train_true_labels which will allow us to train the model not using the output logits of a finetuned BERT model but the actual true labels of the samples used. The spiking_student_model can be the directory where the output of the task-based IKD phase is stored.\
 Note: \
 (1) Since the code uses DataParallel, use CUDA_VISIBLE_DEVICES to specify the GPUs.\
 (2) Use flag --train_true_labels to train the SpikingBERT model using actual true labels (instead of prediction layer distillation i.e. using logits of trained BERT model).
