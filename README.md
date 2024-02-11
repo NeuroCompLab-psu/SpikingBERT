@@ -1,25 +1,25 @@
 SpikingBERT
 ======== 
-SpikingBERT is a Spiking variant of BERT-based encoder-only language model (LM). We use a unique training approach namely, Implicit Differentiation at Equilibrium, which helps us to (a) overcome the non-differentiability issues faced during training SNNs (b) train a deep scalable architecture with drastically reduced memory overrhead. We leverage the convergence of the average spiking rate (ASR) across individual neuronal layers, as outlined in the paper, to employ Implicit Differentiation at Equilibrium (i.e. at the final converged state) for training, instead of the computationally intensive Backpropagation Through Time (BPTT) method. Since training LMs from scratch is an expensive operation we leverage a novel ANN-SNN Knowledge Distillation framework, thereby making efficient use of techniques such as knowledge transfer and model compression. Both internal layer and prediction layer KD is performed to improve model performance as described in the paper. Moreover, KD is performed on both general data (pre-training phase) as well as task-specific data (i.e. for finetuning). SpikingBERT being a spiking architecture allows for dynamic tradeoff of energy/power consumption and accuracy of the model. Moreover, the KD techniques deployed allows to reduce number of model parameters.
+SpikingBERT is a Spiking variant of BERT-based encoder-only language model (LM). We use a unique training approach namely, Implicit Differentiation at Equilibrium, which helps us to (a) overcome the non-differentiability issues faced during training SNNs, (b) train a deep scalable architecture with drastically reduced memory overrhead. We leverage the convergence of the average spiking rate (ASR) across individual neuronal layers, as outlined in the paper, to employ Implicit Differentiation at Equilibrium (i.e. at the final converged state) for training, instead of the computationally intensive Backpropagation Through Time (BPTT) method. Since training LMs from scratch is an expensive operation we leverage a novel ANN-SNN Knowledge Distillation framework, thereby making efficient use of techniques such as knowledge transfer and model compression. Both internal layer and prediction layer KD is performed to improve model performance as described in the paper. Moreover, KD is performed on both general data (pre-training phase) as well as task-specific data (i.e. for finetuning). SpikingBERT being a spiking architecture allows for dynamic tradeoff of energy/power consumption and accuracy of the model. Moreover, the KD techniques deployed allows to reduce number of model parameters.
 
 This code implements the methodology described in the paper titled: "SpikingBERT: Distilling BERT to Train Spiking Language Models Using Implicit
 Differentiation". The paper is accepted at AAAI-24 (https://arxiv.org/abs/2308.10873).
 
 Installation
 ============
-Run command below to install the required packages (**using python3**)
+Run command below to install the required packages (**using python3**).
 ```bash
 pip install -r requirements.txt
 ```
 
 STEP 1: General KD (BERT<sub>BASE</sub>) to SpikingBERT
 ====================
-In this step we use a general domain data such as wikitext-103, wikitext-2 which we process and use to perform KD from a general BERT<sub>BASE</sub> model (uncased) to our SpikingBERT model following the steps given below.
+In this step we use a general domain data such as Wikitext-103, Wikitext-2 which we process and use to perform KD from a general BERT<sub>BASE</sub> model (uncased) to our SpikingBERT model following the steps given below.
 
 (a) Download a pre-trained bert-base-uncased-model from Huggingface or pre-train a BERT model from scratch.  Create
 a configuration file similar to that in spiking_student_model folder (given as a reference).
 
-(b) Download the general corpus and use `preprocess_training_data.py` (an existing pre-processing code) to produce the corpus in json format  
+(b) Download the general corpus and use `preprocess_training_data.py` (an existing pre-processing code) to produce the corpus in json format.  
 
 
 ```
@@ -50,7 +50,7 @@ python spiking_bert_general_distill.py --pregenerated_data ${CORPUS_JSON}$ \
                           --output_dir ${GENERAL_SPIKINGBERT_DIR}$ 
 ```
 
-Step 2: Task-based Internal layer KD (IKD) from Finetuned BERT to task-specific SpikingBERT
+Step 2: Task-based Internal layer KD (IKD) from Fine-tuned BERT to task-specific SpikingBERT
 ==========================
 In the task-specific distillation, we perform task-based IKD as described in the paper to create a corresponding task-specific version of SpikingBERT.
 
@@ -81,9 +81,9 @@ python spiking_bert_task_distill.py --teacher_model ${FT_BERT_BASE_DIR}$ \
 
 
 
-Step 3: Task-specific Prediction layer KD (IKD) from Finetuned BERT to SpikingBERT
+Step 3: Task-specific Prediction layer KD (IKD) from Fine-tuned BERT to SpikingBERT
 ==========================
-(a) use `spiking_bert_task_distill.py` with flag --pred_distill to run the prediction layer distillation. Either in place of or post prediction-layer distillation we can also finetune the model further by adding the flag --train_true_labels which will allow us to train the model not using the output logits of a finetuned BERT model but the actual true labels of the samples used. The spiking_student_model can be the directory where the output of the task-based IKD phase is stored.\
+(a) use `spiking_bert_task_distill.py` with flag --pred_distill to run the prediction layer distillation. Either in place of or post prediction-layer distillation, we can also fine-tune the model further by adding the flag --train_true_labels which will allow us to train the model not using the output logits of a finetuned BERT model but the actual true labels of the samples used. The spiking_student_model can be the directory where the output of the task-based IKD phase is stored.\
 Note: \
 (1) Since the code uses DataParallel, use CUDA_VISIBLE_DEVICES to specify the GPUs.\
 (2) Use flag --train_true_labels to train the SpikingBERT model using actual true labels (instead of prediction layer distillation i.e. using logits of trained BERT model).
@@ -112,7 +112,7 @@ The hyper-parameters given in the paper can be used to recreate the results. We 
 
 Evaluation
 ==========================
-The `spiking_bert_task_distill.py` also provide the evalution by adding the flag --do_eval:
+Model evaluation can be doine using `spiking_bert_task_distill.py` by adding the flag --do_eval as follows:
 
 ```
 ${FINAL_SPIKINGBERT_DIR}$ includes the final trained student spiking model along with config file and vocab file.
@@ -135,7 +135,7 @@ File Details
 (2) modules/snn_modules.py : SNNBERTSpikingLIFFuncMultiLayer class contains the spiking operations inside the model. The neuron dynamics and spike generation are all part of this class. The model is operated for Tconv time steps as described in the paper.\
 (3) modules/snnide_bert_multilayer_modules.py : SNNIDEBERTSpikingMultiLayerModule contains code for efficient training using the method described in the paper.\
 (4) modules/snn_bert_modules.py : Code for individual components specified in the paper and appendix.\
-(5) transformer: This folder contains code specific to BERT (modelling, utilities, optimizer, etc.).
+(5) transformer: This folder contains code specific to BERT (modeling, utilities, optimizer, etc.).
 
 ## Table of important hyper-params and  command line arguments. 
 
@@ -161,8 +161,7 @@ File Details
 
 ## Reference
 
-Please cite this code with the following bibliography:
-
+Please cite this code with the following bibliography (to appear in AAAI-24 proceedings):
 ```
 @article{bal2023spikingbert,
   title={Spikingbert: Distilling bert to train spiking language models using implicit differentiation},
