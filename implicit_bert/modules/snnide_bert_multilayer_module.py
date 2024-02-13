@@ -83,7 +83,7 @@ class SNNIDEBERTSpikingMultiLayerModule(nn.Module):
 
 
             # If threshold < 0 we just take initial estimate from grad which works fine for no-feedback case.
-            if threshold < 0:
+            if threshold > 0:
                 layer_num = 0
                 z0_out_ = self.Backward.apply(self.snn_func_copy, z0_out_, u, segment_ids,  layer_num, extended_attention_mask, sizes_last, threshold, solver_type)
                 layer_num = 6
